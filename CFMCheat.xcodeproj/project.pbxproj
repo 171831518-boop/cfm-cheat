@@ -1,0 +1,254 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A0000012E00000000000001 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000012D00000000000001 /* main.m */; };
+		1A0000022E00000000000002 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000022D00000000000002 /* AppDelegate.m */; };
+		1A0000032E00000000000003 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000032D00000000000003 /* ViewController.m */; };
+		1A0000042E00000000000004 /* MemoryEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000042D00000000000004 /* MemoryEngine.m */; };
+		1A0000052E00000000000005 /* CheatLoop.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000052D00000000000005 /* CheatLoop.m */; };
+		1A0000062E00000000000006 /* RootHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000062D00000000000006 /* RootHelper.m */; };
+		1A0000072E00000000000007 /* DeviceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000072D00000000000007 /* DeviceManager.m */; };
+		1A0000082E00000000000008 /* KernelRW.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000082D00000000000008 /* KernelRW.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1A0000012D00000000000001 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1A0000022D00000000000002 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1A0000022C00000000000002 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		1A0000032D00000000000003 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		1A0000032C00000000000003 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		1A0000042D00000000000004 /* MemoryEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryEngine.m; sourceTree = "<group>"; };
+		1A0000042C00000000000004 /* MemoryEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryEngine.h; sourceTree = "<group>"; };
+		1A0000052D00000000000005 /* CheatLoop.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CheatLoop.m; sourceTree = "<group>"; };
+		1A0000052C00000000000005 /* CheatLoop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CheatLoop.h; sourceTree = "<group>"; };
+		1A0000062D00000000000006 /* RootHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootHelper.m; sourceTree = "<group>"; };
+		1A0000062C00000000000006 /* RootHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootHelper.h; sourceTree = "<group>"; };
+		1A0000072D00000000000007 /* DeviceManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceManager.m; sourceTree = "<group>"; };
+		1A0000072C00000000000007 /* DeviceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceManager.h; sourceTree = "<group>"; };
+		1A0000082D00000000000008 /* KernelRW.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KernelRW.m; sourceTree = "<group>"; };
+		1A00000B2C0000000000000B /* KernelRW.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KernelRW.h; sourceTree = "<group>"; };
+		1A0000082C00000000000008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1A0000092C00000000000009 /* CFMCheat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CFMCheat.entitlements; sourceTree = "<group>"; };
+		1A00000A2C0000000000000A /* CFMCheat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFMCheat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1A00000B2E0000000000000B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A00000C2C0000000000000C = {
+			isa = PBXGroup;
+			children = (
+				1A00000D2C0000000000000D /* CFMCheat */,
+				1A00000E2C0000000000000E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1A00000D2C0000000000000D /* CFMCheat */ = {
+			isa = PBXGroup;
+			children = (
+				1A0000012D00000000000001 /* main.m */,
+				1A0000022C00000000000002 /* AppDelegate.h */,
+				1A0000022D00000000000002 /* AppDelegate.m */,
+				1A0000032C00000000000003 /* ViewController.h */,
+				1A0000032D00000000000003 /* ViewController.m */,
+				1A0000042C00000000000004 /* MemoryEngine.h */,
+				1A0000042D00000000000004 /* MemoryEngine.m */,
+				1A0000052C00000000000005 /* CheatLoop.h */,
+				1A0000052D00000000000005 /* CheatLoop.m */,
+				1A0000062C00000000000006 /* RootHelper.h */,
+				1A0000062D00000000000006 /* RootHelper.m */,
+				1A0000072C00000000000007 /* DeviceManager.h */,
+				1A0000072D00000000000007 /* DeviceManager.m */,
+				1A00000B2C0000000000000B /* KernelRW.h */,
+				1A0000082D00000000000008 /* KernelRW.m */,
+				1A0000082C00000000000008 /* Info.plist */,
+				1A0000092C00000000000009 /* CFMCheat.entitlements */,
+			);
+			path = CFMCheat;
+			sourceTree = "<group>";
+		};
+		1A00000E2C0000000000000E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A00000A2C0000000000000A /* CFMCheat.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A00000F2C0000000000000F /* CFMCheat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A0000102C00000000000010 /* Build configuration list for PBXNativeTarget "CFMCheat" */;
+			buildPhases = (
+				1A0000112E00000000000011 /* Sources */,
+				1A00000B2E0000000000000B /* Frameworks */,
+				1A0000122E00000000000012 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CFMCheat;
+			productName = CFMCheat;
+			productReference = 1A00000A2C0000000000000A /* CFMCheat.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1A0000132C00000000000013 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 1A0000142C00000000000014 /* Build configuration list for PBXProject "CFMCheat" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1A00000C2C0000000000000C;
+			productRefGroup = 1A00000E2C0000000000000E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1A00000F2C0000000000000F /* CFMCheat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1A0000122E00000000000012 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A0000112E00000000000011 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A0000012E00000000000001 /* main.m in Sources */,
+				1A0000022E00000000000002 /* AppDelegate.m in Sources */,
+				1A0000032E00000000000003 /* ViewController.m in Sources */,
+				1A0000042E00000000000004 /* MemoryEngine.m in Sources */,
+				1A0000052E00000000000005 /* CheatLoop.m in Sources */,
+				1A0000062E00000000000006 /* RootHelper.m in Sources */,
+				1A0000072E00000000000007 /* DeviceManager.m in Sources */,
+				1A0000082E00000000000008 /* KernelRW.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1A0000152C00000000000015 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = CFMCheat/CFMCheat.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1A0000162C00000000000016 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = CFMCheat/CFMCheat.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1A0000172C00000000000017 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = CFMCheat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cfm.cheat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1A0000182C00000000000018 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = CFMCheat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cfm.cheat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A0000142C00000000000014 /* Build configuration list for PBXProject "CFMCheat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A0000152C00000000000015 /* Debug */,
+				1A0000162C00000000000016 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A0000102C00000000000010 /* Build configuration list for PBXNativeTarget "CFMCheat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A0000172C00000000000017 /* Debug */,
+				1A0000182C00000000000018 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1A0000132C00000000000013 /* Project object */;
+}

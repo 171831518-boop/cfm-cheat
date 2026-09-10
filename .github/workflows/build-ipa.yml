@@ -1,0 +1,111 @@
+name: Build CFMCheat IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          ls /Applications/ | grep Xcode
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer 2>/dev/null || \
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Clone libkfd
+        run: |
+          git clone --depth 1 https://github.com/felix-pb/kfd.git libkfd_repo
+          ls libkfd_repo/
+
+      - name: Copy libkfd into project
+        run: |
+          # 把 libkfd 源码拷进工程目录供编译
+          mkdir -p CFMCheat/libkfd
+          cp -R libkfd_repo/libkfd/* CFMCheat/libkfd/ 2>/dev/null || \
+          cp -R libkfd_repo/kfd/libkfd/* CFMCheat/libkfd/ 2>/dev/null || \
+          echo "libkfd 目录结构待确认"
+          find CFMCheat/libkfd -name "*.c" -o -name "*.h" | head -20
+
+      - name: Show project structure
+        run: |
+          find . -name "*.m" -o -name "*.h" -o -name "*.c" | sort
+
+      - name: Build (arm64, no signing)
+        run: |
+          xcodebuild \
+            -project CFMCheat.xcodeproj \
+            -scheme CFMCheat \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -derivedDataPath build/DerivedData \
+            build 2>&1 | tail -50 || true
+
+      - name: Build with xcpretty (detailed)
+        run: |
+          xcodebuild \
+            -project CFMCheat.xcodeproj \
+            -scheme CFMCheat \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -derivedDataPath build/DerivedData \
+            build
+
+      - name: Find built .app
+        id: find_app
+        run: |
+          APP_PATH=$(find build/DerivedData -name "CFMCheat.app" -path "*Release-iphoneos*" | head -1)
+          echo "app_path=$APP_PATH" >> $GITHUB_OUTPUT
+          echo "Found app at: $APP_PATH"
+
+      - name: Package IPA
+        run: |
+          mkdir -p build/Payload
+          cp -R "${{ steps.find_app.outputs.app_path }}" build/Payload/
+          cd build
+          zip -qry CFMCheat.ipa Payload
+          ls -la CFMCheat.ipa
+
+      - name: Fake sign with ldid (for sideload)
+        run: |
+          # 安装 ldid（伪签名，供 TrollStore/SideStore 使用）
+          brew install ldid 2>/dev/null || true
+          APP_PATH="${{ steps.find_app.outputs.app_path }}"
+          if command -v ldid &> /dev/null; then
+            ldid -S CFMCheat/CFMCheat.entitlements "$APP_PATH/CFMCheat"
+            echo "ldid 伪签名完成"
+          fi
+          # 重新打包（带伪签名）
+          cd build
+          rm -f CFMCheat.ipa
+          zip -qry CFMCheat.ipa Payload
+          ls -la CFMCheat.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CFMCheat-ipa
+          path: build/CFMCheat.ipa
+          retention-days: 30
+
+      - name: Upload build log (if failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: |
+            build/DerivedData/Logs/Build/*.xcactivitylog
+          retention-days: 7

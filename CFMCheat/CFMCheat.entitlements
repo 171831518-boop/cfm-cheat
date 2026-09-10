@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 允许 task_for_pid 附加其他进程（越狱环境必需） -->
+	<key>get-task-allow</key>
+	<true/>
+	<!-- 允许动态库注入（越狱环境） -->
+	<key>com.apple.private.skip-library-validation</key>
+	<true/>
+	<!-- 允许内存分配/读写 -->
+	<key>com.apple.private.memorystatus</key>
+	<true/>
+	<!-- 允许平台化（越狱，访问 root） -->
+	<key>platform-application</key>
+	<true/>
+	<!-- 允许 task_for_pid 权限 -->
+	<key>task_for_pid-allow</key>
+	<true/>
+</dict>
+</plist>
