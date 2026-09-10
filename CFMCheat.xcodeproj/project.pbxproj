@@ -15,6 +15,7 @@
 		1A0000062E00000000000006 /* RootHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000062D00000000000006 /* RootHelper.m */; };
 		1A0000072E00000000000007 /* DeviceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000072D00000000000007 /* DeviceManager.m */; };
 		1A0000082E00000000000008 /* KernelRW.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000082D00000000000008 /* KernelRW.m */; };
+		1A0000092E00000000000009 /* kfd_shim.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000092D00000000000009 /* kfd_shim.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -217,6 +218,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/CFMCheat/libkfd",
+				);
 				INFOPLIST_FILE = CFMCheat/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

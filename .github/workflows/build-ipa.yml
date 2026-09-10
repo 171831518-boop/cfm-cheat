@@ -64,7 +64,6 @@ jobs:
       - name: Build app (arm64, no signing)
         run: |
           set -o pipefail
-          LIBKFD_LIB_ABS="$(pwd)/CFMCheat/lib"
           xcodebuild \
             -project CFMCheat.xcodeproj \
             -target CFMCheat \
@@ -74,8 +73,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            LIBRARY_SEARCH_PATHS="$LIBKFD_LIB_ABS" \
-            OTHER_LDFLAGS="-lkfd" \
+            HEADER_SEARCH_PATHS="$(pwd)/CFMCheat/libkfd" \
             SYMROOT="$(pwd)/build/SYMROOT" \
             OBJROOT="$(pwd)/build/OBJROOT" \
             build 2>&1 | tee build_output.log | tail -60
