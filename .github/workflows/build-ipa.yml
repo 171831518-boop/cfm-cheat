@@ -30,36 +30,16 @@ jobs:
           git clone --depth 1 https://github.com/felix-pb/kfd.git libkfd_repo
           find libkfd_repo -type d | head -30
 
-      - name: Build libkfd static library (arm64)
+      - name: Vendor libkfd headers into project
         run: |
           set -e
-          LIBKFD_SRC=$(find libkfd_repo -type d -name "libkfd" | head -1)
-          echo "libkfd 源码目录: $LIBKFD_SRC"
-          find "$LIBKFD_SRC" \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) | sort
-          SDK=$(xcrun --sdk iphoneos --show-sdk-path)
-          CLANGXX=$(xcrun --sdk iphoneos -f clang++)
-          # 头文件搜索路径：libkfd 目录本身 + 所有子目录
-          INC=""
-          for d in $(find "$LIBKFD_SRC" -type d); do
-            INC="$INC -I$d"
-          done
-          OBJDIR=libkfd_objs
-          mkdir -p "$OBJDIR"
-          i=0
-          for f in $(find "$LIBKFD_SRC" -name "*.cpp"); do
-            i=$((i+1))
-            echo "compile[$i]: $f"
-            $CLANGXX -c -arch arm64 -miphoneos-version-min=14.0 \
-              -O2 -DNDEBUG \
-              $INC \
-              -isysroot "$SDK" \
-              "$f" -o "$OBJDIR/src_$i.o" || { echo "FAILED: $f"; exit 1; }
-          done
-          ls "$OBJDIR" | head -5
-          libtool -static -o libkfd.a "$OBJDIR"/*.o
-          mkdir -p CFMCheat/lib
-          cp libkfd.a CFMCheat/lib/
-          ls -la CFMCheat/lib/
+          # libkfd 是 header-only 实现（kopen/kread/kwrite/kclose 定义在 libkfd.h）
+          # 仓库结构: kfd/libkfd.h + kfd/libkfd/*.h
+          cp -R libkfd_repo/kfd CFMCheat/libkfd
+          echo "=== vendored headers ==="
+          find CFMCheat/libkfd -name "*.h" | head -10
+          echo "=== shim ==="
+          cat CFMCheat/kfd_shim.c
 
       - name: Build app (arm64, no signing)
         run: |
