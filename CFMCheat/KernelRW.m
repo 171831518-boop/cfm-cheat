@@ -145,7 +145,7 @@ static int currentIOSMinorVersion(void) {
     return YES;
 }
 
-+ (void)release {
++ (void)teardown {
     if (g_kfd != 0) {
         kclose(g_kfd);
         g_kfd = 0;

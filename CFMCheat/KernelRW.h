@@ -38,7 +38,7 @@ typedef enum {
 // —— 提权（等价靶场「获取 root」）——
 + (BOOL)isSupported;                 // 检测当前 iOS 是否有对应偏移表
 + (BOOL)acquire;                     // 打 kfd 拿 KRW，成功返回 YES
-+ (void)release;                     // 关闭 kfd，释放
++ (void)teardown;                    // 关闭 kfd，释放（不叫 release，避免 ARC 语义冲突）
 + (BOOL)isReady;                     // KRW 是否已建立
 
 // —— 内核读写原语（等价靶场 remote_read64 / remote_write_int）——
