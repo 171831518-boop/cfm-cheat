@@ -83,13 +83,14 @@ jobs:
       - name: Publish build log to repo (on failure)
         if: failure()
         run: |
-          CONTENT=$(base64 -i build_output.log | tr -d '\n')
-          printf '{"message":"ci build log %s","content":"%s","branch":"main"}' "$(date +%s)" "$CONTENT" > /tmp/payload.json
-          curl -s -X PUT \
+          tail -1500 build_output.log > log_tail.txt || cp build_output.log log_tail.txt
+          jq -n --rawfile log log_tail.txt '{message:"ci build log", content: ($log | @base64)}' > /tmp/payload.json
+          curl -sf -X PUT \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             -d @/tmp/payload.json \
-            "https://api.github.com/repos/${{ github.repository }}/contents/build_output.log" | tail -2
+            "https://api.github.com/repos/${{ github.repository }}/contents/build_output.log" \
+            || echo "WARN: 日志发布失败（不影响主流程）"
 
       - name: Package IPA
         if: success()
