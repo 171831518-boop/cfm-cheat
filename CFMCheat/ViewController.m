@@ -76,7 +76,7 @@
     [self.view addSubview:btn];
 }
 
-- (void)addSwitch:(NSString *)title atY:(CGFloat)y switchRef:(UISwitch **)ref {
+- (void)addSwitch:(NSString *)title atY:(CGFloat)y switchRef:(UISwitch * __unsafe_unretained *)ref {
     CGFloat w = self.view.bounds.size.width - 40;
     UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(20, y, 120, 40)];
     lbl.text = title;

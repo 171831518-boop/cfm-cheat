@@ -7,6 +7,7 @@
 
 #import "DeviceManager.h"
 #import <UIKit/UIKit.h>
+#import <CoreFoundation/CoreFoundation.h>
 
 @implementation DeviceManager
 
@@ -51,11 +52,7 @@
     }
 
     // 3. 同步偏好（让删除生效）
-    if (@available(iOS 11.0, *)) {
-        // 用 CFPreferences 强制同步
-        extern void CFPreferencesAppSynchronize(CFStringRef applicationID);
-        CFPreferencesAppSynchronize((__bridge CFStringRef)[[NSBundle mainBundle] bundleIdentifier]);
-    }
+    CFPreferencesAppSynchronize((__bridge CFStringRef)[[NSBundle mainBundle] bundleIdentifier]);
 
     // 4. 清 NSUserDefaults 里的授权相关键
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
