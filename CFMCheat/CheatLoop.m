@@ -5,7 +5,7 @@
 //  每帧功能循环实现（等价靶场 freeze_loop）
 //
 //  双路线：
-//  1. KernelRW 路线（免越狱）：打 kfd 拿内核读写，从内核定位游戏进程读写内存
+//  1. KernelRW 路线（免越狱）：kfd 内核读写 + pmap 页表翻译写游戏进程内存
 //  2. MemoryEngine 路线（越狱）：task_for_pid + mach_vm_read/write
 //  优先 KernelRW（普通机可用），回退 MemoryEngine（越狱机）
 //
@@ -16,23 +16,25 @@
 
 // 功能偏移链（老板给定）
 // 红透：cf + 0xC000060 + 0xA0 + 0x240 + 0x108 + 0x14C  -> 写 65536
-// 吸附：cf + 0xC001DF8 + 0xA0 + 0x70 + 0x1F8  -> 写 10
+// 吸附：cf + 0xC001DF8 + 0xA0 + 0x70 + 0x1F8           -> 写 10
+// 链语义（CE 惯例）：addr = base+off0；cur = *(addr)+off1；...
+// 末级不解引用：写入地址 = 倒数第二级解引用结果 + 末级偏移
 static const uint64_t HongtouOffsets[] = { 0xC000060, 0xA0, 0x240, 0x108, 0x14C };
 static const int     HongtouCount = 5;
-static const uint64_t HongtouValue = 65536;
+static const uint32_t HongtouValue = 65536;
 
 static const uint64_t XifuOffsets[] = { 0xC001DF8, 0xA0, 0x70, 0x1F8 };
 static const int     XifuCount = 4;
-static const uint64_t XifuValue = 10;
+static const uint32_t XifuValue = 10;
 
-// 穿越火线手游可能的进程名（按优先级）
+// 穿越火线手游可能的进程名（p_comm 16 字节截断，中文 12 字节够用）
 static NSArray<NSString *> *GameProcNames(void) {
     return @[
-        @"穿越火线",          // 主进程名（中文）
-        @"CrossFire",        // 英文
-        @"cf",               // 简写
-        @"CFM",              // 穿越火线：枪战王者 官方缩写
-        @"com.tencent.tmgp.cf", // bundle id 兜底（一般不是进程名，但留作参考）
+        @"穿越火线",
+        @"CrossFire",
+        @"cf",
+        @"CFM",
+        @"com.tencent.tmgp.cf",
     ];
 }
 
@@ -40,7 +42,7 @@ static NSArray<NSString *> *GameProcNames(void) {
     BOOL _running;
     dispatch_source_t _timer;
     uint64_t _gameBase;      // 游戏模块基址（cf，等价 _cfm_taskAddr）
-    NSString *_procName;     // 命中的进程名
+    int      _gamePid;       // 游戏 pid
 }
 
 + (instancetype)shared {
@@ -57,6 +59,7 @@ static NSArray<NSString *> *GameProcNames(void) {
         _hongtouEnabled = NO;
         _xifuEnabled = NO;
         _gameBase = 0;
+        _gamePid = 0;
     }
     return self;
 }
@@ -96,14 +99,17 @@ static NSArray<NSString *> *GameProcNames(void) {
 - (uint64_t)resolveGameBase {
     if (_gameBase != 0) return _gameBase;
 
-    // 先尝试 KernelRW 路线（免越狱）
+    // KernelRW 路线（免越狱）：sysctl 查 pid -> 内核 proc 链 -> vm_map min_offset
     if ([KernelRW isReady]) {
         for (NSString *name in GameProcNames()) {
-            uint64_t base = [KernelRW gameBase:name];
+            int pid = [KernelRW findGamePidByName:name];
+            if (pid == 0) continue;
+            uint64_t base = [KernelRW gameBaseForPid:pid];
             if (base != 0) {
                 _gameBase = base;
-                _procName = name;
-                NSLog(@"[CFMCheat] 游戏基址(KRW) %@ = 0x%llx", name, base);
+                _gamePid = pid;
+                [KernelRW setCachedGamePid:pid];
+                NSLog(@"[CFMCheat] 游戏基址(KRW) %@ pid=%d = 0x%llx", name, pid, base);
                 return base;
             }
         }
@@ -113,7 +119,6 @@ static NSArray<NSString *> *GameProcNames(void) {
     MemoryEngine *eng = [MemoryEngine shared];
     if (eng.task != MACH_PORT_NULL && eng.base != 0) {
         _gameBase = eng.base;
-        _procName = eng.procName;
         NSLog(@"[CFMCheat] 游戏基址(mach) %@ = 0x%llx", eng.procName, eng.base);
         return _gameBase;
     }
@@ -129,9 +134,8 @@ static NSArray<NSString *> *GameProcNames(void) {
 
     if (_hongtouEnabled) {
         if ([KernelRW isReady]) {
-            [KernelRW writeChain:base offsets:HongtouOffsets count:HongtouCount value:HongtouValue];
+            [KernelRW gameWriteChain32:base offsets:HongtouOffsets count:HongtouCount value:HongtouValue];
         } else {
-            // mach 路线（保留）
             MemoryEngine *eng = [MemoryEngine shared];
             [eng writeChain64:base offsets:HongtouOffsets count:HongtouCount value:HongtouValue];
         }
@@ -139,7 +143,7 @@ static NSArray<NSString *> *GameProcNames(void) {
 
     if (_xifuEnabled) {
         if ([KernelRW isReady]) {
-            [KernelRW writeChain:base offsets:XifuOffsets count:XifuCount value:XifuValue];
+            [KernelRW gameWriteChain32:base offsets:XifuOffsets count:XifuCount value:XifuValue];
         } else {
             MemoryEngine *eng = [MemoryEngine shared];
             [eng writeChain64:base offsets:XifuOffsets count:XifuCount value:XifuValue];

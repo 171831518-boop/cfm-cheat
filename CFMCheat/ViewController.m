@@ -4,6 +4,9 @@
 //
 //  主界面：获取root / 开始读写 / 注销设备 / 红透 / 吸附
 //
+//  v2：「获取 root」在后台线程打 kfd exploit（几秒到几十秒），主线程只转圈，
+//  不再冻 UI；不支持的系统版本直接报原因，不跑 exploit。
+//
 
 #import "ViewController.h"
 #import "RootHelper.h"
@@ -15,8 +18,10 @@
 @interface ViewController ()
 
 @property (nonatomic, strong) UILabel *statusLabel;
+@property (nonatomic, strong) UIButton *rootButton;
 @property (nonatomic, strong) UISwitch *hongtouSwitch;
 @property (nonatomic, strong) UISwitch *xifuSwitch;
+@property (nonatomic, assign) BOOL acquiring;
 
 @end
 
@@ -28,6 +33,16 @@
     self.title = @"CFM 外挂";
 
     [self buildUI];
+
+    // 启动即做支持性预检，把结果亮出来
+    NSString *err = [KernelRW supportError];
+    if (err) {
+        self.statusLabel.text = [NSString stringWithFormat:@"⚠️ 免越狱提权预检未通过：\n%@", err];
+        self.statusLabel.textColor = [UIColor systemOrangeColor];
+    } else {
+        self.statusLabel.text = @"✅ 当前内核版本在 kfd 支持表内，可点「获取 root」";
+        self.statusLabel.textColor = [UIColor systemGreenColor];
+    }
 }
 
 - (void)buildUI {
@@ -36,16 +51,16 @@
     CGFloat h = 56;
 
     // 状态标签
-    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 80, w, 40)];
-    self.statusLabel.font = [UIFont systemFontOfSize:13];
+    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 70, w, 60)];
+    self.statusLabel.font = [UIFont systemFontOfSize:12];
     self.statusLabel.numberOfLines = 0;
     self.statusLabel.textColor = [UIColor grayColor];
     self.statusLabel.text = @"未连接";
     [self.view addSubview:self.statusLabel];
 
     // 获取 root 按钮
-    y = 130;
-    [self addButton:@"获取 root" atY:y action:@selector(onGainRoot:)];
+    y = 140;
+    self.rootButton = [self addButton:@"获取 root" atY:y action:@selector(onGainRoot:)];
     y += h + 12;
 
     // 开始读写 按钮
@@ -64,7 +79,7 @@
     [self addSwitch:@"吸附" atY:y switchRef:&_xifuSwitch];
 }
 
-- (void)addButton:(NSString *)title atY:(CGFloat)y action:(SEL)sel {
+- (UIButton *)addButton:(NSString *)title atY:(CGFloat)y action:(SEL)sel {
     CGFloat w = self.view.bounds.size.width - 40;
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.frame = CGRectMake(20, y, w, 56);
@@ -74,6 +89,7 @@
     btn.layer.cornerRadius = 8;
     [btn addTarget:self action:sel forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
+    return btn;
 }
 
 - (void)addSwitch:(NSString *)title atY:(CGFloat)y switchRef:(UISwitch *__strong *)ref {
@@ -91,40 +107,83 @@
 #pragma mark - 功能动作
 
 - (void)onGainRoot:(id)sender {
-    // 等价靶场「获取 root」：优先打 kfd 拿内核读写（免越狱），回退越狱 setuid
-    BOOL supported = [KernelRW isSupported];
-    BOOL acquired = [KernelRW acquire];
+    if (self.acquiring) return;
 
-    if (acquired) {
-        self.statusLabel.text = @"root 已获取（kfd 内核读写就绪）";
-        NSLog(@"[CFMCheat] kfd KRW acquired");
+    // 预检：不支持直接说原因，不跑 exploit
+    NSString *err = [KernelRW supportError];
+    if (err) {
+        self.statusLabel.text = [NSString stringWithFormat:@"⚠️ 预检未通过：\n%@", err];
+        self.statusLabel.textColor = [UIColor systemOrangeColor];
         return;
     }
 
-    // 回退：越狱 setuid 路线
+    // KRW 已就绪
+    if ([KernelRW isReady]) {
+        self.statusLabel.text = @"root 已获取（kfd 内核读写就绪）";
+        return;
+    }
+
+    // 后台跑 exploit，主线程转圈
+    self.acquiring = YES;
+    self.rootButton.enabled = NO;
+    [self.rootButton setTitle:@"提权中…（几秒到几十秒）" forState:UIControlStateDisabled];
+    self.statusLabel.textColor = [UIColor grayColor];
+    self.statusLabel.text = @"正在打 kfd 内核漏洞…";
+
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    [KernelRW acquireWithProgress:^(NSString *msg) {
+        self.statusLabel.text = msg;
+    } completion:^(BOOL ok, NSString *msg) {
+        self.acquiring = NO;
+        self.rootButton.enabled = YES;
+        [self.rootButton setTitle:@"获取 root" forState:UIControlStateNormal];
+        self.statusLabel.text = msg;
+        self.statusLabel.textColor = ok ? [UIColor systemGreenColor] : [UIColor systemRedColor];
+
+        if (ok) {
+            [self tryStartLoopIfSwitchesOn];
+        } else if (![KernelRW isSupported]) {
+            // kfd 失败且回退越狱路线
+            [self fallbackJailbreakRoot];
+        }
+    }];
+}
+
+- (void)fallbackJailbreakRoot {
     BOOL jb = [RootHelper isJailbroken];
+    if (!jb) return;
     BOOL root = [RootHelper isRoot];
     BOOL gained = [RootHelper gainRoot];
-
     if (root || gained) {
         self.statusLabel.text = [NSString stringWithFormat:@"root 已获取 (euid=%d)", geteuid()];
-    } else if (jb) {
-        self.statusLabel.text = @"已越狱但提权失败，检查签名 entitlements";
+        self.statusLabel.textColor = [UIColor systemGreenColor];
     } else {
-        self.statusLabel.text = supported
-            ? @"kfd 提权失败（可重试）"
-            : @"当前 iOS 版本不支持免越狱提权";
+        self.statusLabel.text = @"已越狱但提权失败，检查签名 entitlements";
+        self.statusLabel.textColor = [UIColor systemRedColor];
     }
 }
 
+// 开关本来就开着时，提权成功直接起循环
+- (void)tryStartLoopIfSwitchesOn {
+    if (self.hongtouSwitch.isOn || self.xifuSwitch.isOn) {
+        [self startLoop];
+    }
+}
+
+- (void)startLoop {
+    CheatLoop *loop = [CheatLoop shared];
+    loop.hongtouEnabled = self.hongtouSwitch.isOn;
+    loop.xifuEnabled = self.xifuSwitch.isOn;
+    [loop start];
+}
+
 - (void)onStartReadWrite:(id)sender {
-    // 优先 KernelRW 路线（免越狱），回退 mach 路线（越狱）
+    // KRW 路线（免越狱）
     if ([KernelRW isReady]) {
-        // CheatLoop 的 tick 会自动通过 KernelRW 定位游戏基址，这里只启动循环
-        [CheatLoop shared].hongtouEnabled = self.hongtouSwitch.isOn;
-        [CheatLoop shared].xifuEnabled = self.xifuSwitch.isOn;
-        [[CheatLoop shared] start];
+        [self startLoop];
         self.statusLabel.text = @"读写循环已启动（KRW 内核路线）";
+        self.statusLabel.textColor = [UIColor systemGreenColor];
         return;
     }
 
@@ -140,26 +199,25 @@
     }
     if (!ok) {
         self.statusLabel.text = @"附加失败：游戏未运行或无权访问（先点「获取 root」）";
+        self.statusLabel.textColor = [UIColor systemRedColor];
         return;
     }
 
-    self.statusLabel.text = [NSString stringWithFormat:@"已连接 %@ pid=%d base=0x%llx", procName, eng.pid, eng.base];
-
-    CheatLoop *loop = [CheatLoop shared];
-    loop.hongtouEnabled = self.hongtouSwitch.isOn;
-    loop.xifuEnabled = self.xifuSwitch.isOn;
-    [loop start];
-
-    self.statusLabel.text = [self.statusLabel.text stringByAppendingString:@"\n读写循环已启动"];
+    [self startLoop];
+    self.statusLabel.text = [NSString stringWithFormat:
+        @"已连接 %@ pid=%d base=0x%llx\n读写循环已启动", procName, eng.pid, eng.base];
+    self.statusLabel.textColor = [UIColor systemGreenColor];
 }
 
 - (void)onUnregister:(id)sender {
     BOOL ok = [DeviceManager unregister];
-    self.statusLabel.text = ok ? @"已注销设备" : @"注销失败";
+    self.statusLabel.text = ok
+        ? @"已注销：内核读写已释放、循环已停止、授权状态已清除"
+        : @"注销失败";
+    self.statusLabel.textColor = ok ? [UIColor systemGreenColor] : [UIColor systemRedColor];
 }
 
 - (void)onSwitchChanged:(UISwitch *)sw {
-    // 实时同步到循环
     if (sw == self.hongtouSwitch) {
         [CheatLoop shared].hongtouEnabled = sw.isOn;
         NSLog(@"[CFMCheat] 红透 = %d", sw.isOn);
