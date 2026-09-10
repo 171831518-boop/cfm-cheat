@@ -76,7 +76,8 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             LIBRARY_SEARCH_PATHS="$LIBKFD_LIB_ABS" \
             OTHER_LDFLAGS="-lkfd" \
-            -derivedDataPath build/DerivedData \
+            SYMROOT="$(pwd)/build/SYMROOT" \
+            OBJROOT="$(pwd)/build/OBJROOT" \
             build 2>&1 | tee build_output.log | tail -60
 
       - name: Publish build log to repo (on failure)
@@ -93,7 +94,7 @@ jobs:
       - name: Package IPA
         if: success()
         run: |
-          APP_PATH=$(find build/DerivedData -name "CFMCheat.app" -path "*Release-iphoneos*" | head -1)
+          APP_PATH=$(find build -name "CFMCheat.app" -path "*Release-iphoneos*" | head -1)
           echo "APP: $APP_PATH"
           test -n "$APP_PATH"
           mkdir -p build/Payload
