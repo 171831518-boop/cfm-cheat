@@ -36,6 +36,7 @@
 		1A00000B2C0000000000000B /* KernelRW.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KernelRW.h; sourceTree = "<group>"; };
 		1A0000082C00000000000008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A0000092C00000000000009 /* CFMCheat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CFMCheat.entitlements; sourceTree = "<group>"; };
+		1A0000092D00000000000009 /* kfd_shim.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kfd_shim.c; sourceTree = "<group>"; };
 		1A00000A2C0000000000000A /* CFMCheat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFMCheat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -76,6 +77,7 @@
 				1A0000072D00000000000007 /* DeviceManager.m */,
 				1A00000B2C0000000000000B /* KernelRW.h */,
 				1A0000082D00000000000008 /* KernelRW.m */,
+				1A0000092D00000000000009 /* kfd_shim.c */,
 				1A0000082C00000000000008 /* Info.plist */,
 				1A0000092C00000000000009 /* CFMCheat.entitlements */,
 			);
@@ -160,6 +162,7 @@
 				1A0000062E00000000000006 /* RootHelper.m in Sources */,
 				1A0000072E00000000000007 /* DeviceManager.m in Sources */,
 				1A0000082E00000000000008 /* KernelRW.m in Sources */,
+				1A0000092E00000000000009 /* kfd_shim.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
