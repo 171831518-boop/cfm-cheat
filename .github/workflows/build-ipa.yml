@@ -83,14 +83,12 @@ jobs:
       - name: Publish build log to repo (on failure)
         if: failure()
         run: |
-          tail -1500 build_output.log > log_tail.txt || cp build_output.log log_tail.txt
-          jq -n --rawfile log log_tail.txt '{message:"ci build log", content: ($log | @base64)}' > /tmp/payload.json
-          curl -sf -X PUT \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            -d @/tmp/payload.json \
-            "https://api.github.com/repos/${{ github.repository }}/contents/build_output.log" \
-            || echo "WARN: 日志发布失败（不影响主流程）"
+          tail -2000 build_output.log > /tmp/tail.log && mv /tmp/tail.log build_output.log
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@users.noreply.github.com"
+          git add build_output.log
+          git commit -m "ci build log [skip ci]" || echo "nothing to commit"
+          git push origin HEAD:main || echo "WARN: push log failed"
 
       - name: Package IPA
         if: success()
