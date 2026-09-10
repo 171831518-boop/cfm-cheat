@@ -7,9 +7,20 @@
 
 #import "MemoryEngine.h"
 #import <mach/mach.h>
-#import <mach/mach_vm.h>
 #import <mach-o/dyld.h>
 #import <sys/sysctl.h>
+
+// 新 SDK (Xcode 26+) 的 mach/mach_vm.h 直接 #error，改为手动 extern 声明。
+// 这些符号都在 libsystem_kernel.dylib 里，真实存在。
+extern kern_return_t mach_vm_read_overwrite(vm_map_read_t target_task,
+                                            mach_vm_address_t address,
+                                            mach_vm_size_t size,
+                                            mach_vm_address_t data,
+                                            mach_vm_size_t *outsize);
+extern kern_return_t mach_vm_write(vm_map_t target_task,
+                                   mach_vm_address_t address,
+                                   vm_offset_t data,
+                                   mach_msg_type_number_t size);
 
 // task_for_pid 在 iOS 上非公开 API，需手动声明（越狱环境有效）
 extern kern_return_t task_for_pid(mach_port_t target_tport, int pid, mach_port_t *t);
